@@ -61,3 +61,69 @@ CREATE TABLE employee_projects (
     start_date DATE,
     end_date DATE
 );
+
+
+-- 为技能表添加日语注释
+COMMENT ON TABLE skills IS '従業員のスキル情報を格納します';
+
+-- 为客户表添加日语注释
+COMMENT ON TABLE clients IS '企業の顧客情報を格納します';
+
+-- 为项目表添加日语注释
+COMMENT ON TABLE projects IS '企業のプロジェクト情報を格納します';
+
+-- 为员工表添加日语注释
+COMMENT ON TABLE employees IS '企業の従業員情報を格納します';
+
+-- 为勤务表添加日语注释
+COMMENT ON TABLE attendances IS '従業員の勤務情報を格納します';
+
+-- 为员工-项目派遣表添加日语注释
+COMMENT ON TABLE employee_projects IS '従業員とプロジェクトの関連情報を格納します';
+
+
+-- 为技能表的字段添加日语版注释
+COMMENT ON COLUMN skills.id IS 'ID';
+COMMENT ON COLUMN skills.skill_name IS 'スキル名';
+COMMENT ON COLUMN skills.description IS '説明';
+
+-- 为客户表的字段添加日语版注释
+COMMENT ON COLUMN clients.id IS 'ID';
+COMMENT ON COLUMN clients.client_name IS 'クライアント名';
+COMMENT ON COLUMN clients.contact_name IS '連絡先名';
+COMMENT ON COLUMN clients.contact_phone IS '連絡先電話';
+COMMENT ON COLUMN clients.contact_email IS '連絡先メール';
+COMMENT ON COLUMN clients.address IS '住所';
+
+-- 为项目表的字段添加日语版注释
+COMMENT ON COLUMN projects.id IS 'ID';
+COMMENT ON COLUMN projects.project_name IS 'プロジェクト名';
+COMMENT ON COLUMN projects.client_id IS 'クライアントID';
+COMMENT ON COLUMN projects.start_date IS '開始日';
+COMMENT ON COLUMN projects.end_date IS '終了日';
+COMMENT ON COLUMN projects.description IS '説明';
+
+-- 为员工表的字段添加日语版注释
+COMMENT ON COLUMN employees.id IS 'ID';
+COMMENT ON COLUMN employees.name IS '名前';
+COMMENT ON COLUMN employees.position IS '役職';
+COMMENT ON COLUMN employees.base_salary IS '基本給与';
+COMMENT ON COLUMN employees.address IS '住所';
+COMMENT ON COLUMN employees.phone IS '電話番号';
+COMMENT ON COLUMN employees.hire_date IS '雇用日';
+COMMENT ON COLUMN employees.skill_id IS 'スキルID';
+
+-- 为勤务表的字段添加日语版注释
+COMMENT ON COLUMN attendances.id IS 'ID';
+COMMENT ON COLUMN attendances.employee_id IS '従業員ID';
+COMMENT ON COLUMN attendances.date IS '日付';
+COMMENT ON COLUMN attendances.hours_worked IS '勤務時間';
+COMMENT ON COLUMN attendances.is_absent IS '欠勤';
+COMMENT ON COLUMN attendances.overtime_hours IS '残業時間';
+
+-- 为员工-项目派遣表的字段添加日语版注释
+COMMENT ON COLUMN employee_projects.id IS 'ID;
+COMMENT ON COLUMN employee_projects.employee_id IS '従業員ID';
+COMMENT ON COLUMN employee_projects.project_id IS 'プロジェクトID';
+COMMENT ON COLUMN employee_projects.start_date IS '開始日';
+COMMENT ON COLUMN employee_projects.end_date IS '終了日';
