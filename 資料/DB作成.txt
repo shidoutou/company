@@ -1,0 +1,63 @@
+-- 技能表
+DROP TABLE IF EXISTS skills CASCADE;
+CREATE TABLE skills (
+    id SERIAL PRIMARY KEY,
+    skill_name VARCHAR(255) NOT NULL,
+    description TEXT
+);
+
+-- 客户表
+DROP TABLE IF EXISTS clients CASCADE;
+CREATE TABLE clients (
+    id SERIAL PRIMARY KEY,
+    client_name VARCHAR(255) NOT NULL,
+    contact_name VARCHAR(255),
+    contact_phone VARCHAR(15),
+    contact_email VARCHAR(255),
+    address VARCHAR(500)
+);
+
+-- 项目表
+DROP TABLE IF EXISTS projects CASCADE;
+CREATE TABLE projects (
+    id SERIAL PRIMARY KEY,
+    project_name VARCHAR(255) NOT NULL,
+    client_id INTEGER REFERENCES clients(id),
+    start_date DATE,
+    end_date DATE,
+    description TEXT
+);
+
+-- 员工表
+DROP TABLE IF EXISTS employees CASCADE;
+CREATE TABLE employees (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    position VARCHAR(255) NOT NULL,
+    base_salary DECIMAL(10,2) NOT NULL,
+    address VARCHAR(500),
+    phone VARCHAR(15),
+    hire_date DATE,
+    skill_id INTEGER REFERENCES skills(id)
+);
+
+-- 勤务表
+DROP TABLE IF EXISTS attendances CASCADE;
+CREATE TABLE attendances (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER REFERENCES employees(id),
+    date DATE NOT NULL,
+    hours_worked DECIMAL(5,2) NOT NULL,
+    is_absent BOOLEAN DEFAULT FALSE,
+    overtime_hours DECIMAL(5,2) DEFAULT 0
+);
+
+-- 员工-项目派遣表
+DROP TABLE IF EXISTS employee_projects CASCADE;
+CREATE TABLE employee_projects (
+    id SERIAL PRIMARY KEY,
+    employee_id INTEGER REFERENCES employees(id),
+    project_id INTEGER REFERENCES projects(id),
+    start_date DATE,
+    end_date DATE
+);
