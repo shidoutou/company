@@ -122,7 +122,7 @@ COMMENT ON COLUMN attendances.is_absent IS '欠勤';
 COMMENT ON COLUMN attendances.overtime_hours IS '残業時間';
 
 -- 为员工-项目派遣表的字段添加日语版注释
-COMMENT ON COLUMN employee_projects.id IS 'ID;
+COMMENT ON COLUMN employee_projects.id IS 'ID';
 COMMENT ON COLUMN employee_projects.employee_id IS '従業員ID';
 COMMENT ON COLUMN employee_projects.project_id IS 'プロジェクトID';
 COMMENT ON COLUMN employee_projects.start_date IS '開始日';
