@@ -1,129 +1,265 @@
--- 技能表
-DROP TABLE IF EXISTS skills CASCADE;
-CREATE TABLE skills (
-    id SERIAL PRIMARY KEY,
-    skill_name VARCHAR(255) NOT NULL,
-    description TEXT
-);
-
--- 客户表
-DROP TABLE IF EXISTS clients CASCADE;
-CREATE TABLE clients (
-    id SERIAL PRIMARY KEY,
-    client_name VARCHAR(255) NOT NULL,
-    contact_name VARCHAR(255),
-    contact_phone VARCHAR(15),
-    contact_email VARCHAR(255),
-    address VARCHAR(500)
-);
-
--- 项目表
-DROP TABLE IF EXISTS projects CASCADE;
-CREATE TABLE projects (
-    id SERIAL PRIMARY KEY,
-    project_name VARCHAR(255) NOT NULL,
-    client_id INTEGER REFERENCES clients(id),
-    start_date DATE,
-    end_date DATE,
-    description TEXT
-);
-
--- 员工表
-DROP TABLE IF EXISTS employees CASCADE;
-CREATE TABLE employees (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
-    position VARCHAR(255) NOT NULL,
-    base_salary INTEGER NOT NULL,
-    address VARCHAR(500),
-    phone VARCHAR(15),
-    hire_date DATE,
-    skill_id INTEGER REFERENCES skills(id)
-);
-
--- 勤务表
-DROP TABLE IF EXISTS attendances CASCADE;
+-- テーブルの作成
 CREATE TABLE attendances (
-    id SERIAL PRIMARY KEY,
-    employee_id INTEGER REFERENCES employees(id),
-    date DATE NOT NULL,
-    hours_worked DECIMAL(5,2) NOT NULL,
-    is_absent BOOLEAN DEFAULT FALSE,
-    overtime_hours DECIMAL(5,2) DEFAULT 0
+    id serial PRIMARY KEY,
+    employee_id integer,
+    date date NOT NULL,
+    hours_worked numeric(5, 2) NOT NULL,
+    is_absent boolean DEFAULT false,
+    overtime_hours numeric(5, 2) DEFAULT 0,
+    description text
 );
 
--- 员工-项目派遣表
-DROP TABLE IF EXISTS employee_projects CASCADE;
-CREATE TABLE employee_projects (
-    id SERIAL PRIMARY KEY,
-    employee_id INTEGER REFERENCES employees(id),
-    project_id INTEGER REFERENCES projects(id),
-    start_date DATE,
-    end_date DATE
+-- インデックスの作成
+CREATE UNIQUE INDEX attendances_pkey ON attendances (id);
+
+-- 制約の追加
+ALTER TABLE attendances ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE attendances ADD CONSTRAINT date_not_null CHECK (date IS NOT NULL);
+ALTER TABLE attendances ADD CONSTRAINT hours_worked_not_null CHECK (hours_worked IS NOT NULL);
+
+-- テーブルの作成
+CREATE TABLE customers (
+    id serial PRIMARY KEY,
+    customer_name character varying(255) NOT NULL,
+    contact_name character varying(255) NOT NULL,
+    contact_phone character varying(15) NOT NULL,
+    contact_email character varying(255) NOT NULL,
+    address character varying(500) NOT NULL
+);
+
+-- インデックスの作成
+CREATE UNIQUE INDEX customers_pkey ON customers (id);
+
+-- 制約の追加
+ALTER TABLE customers ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE customers ADD CONSTRAINT customer_name_not_null CHECK (customer_name IS NOT NULL);
+ALTER TABLE customers ADD CONSTRAINT contact_name_not_null CHECK (contact_name IS NOT NULL);
+ALTER TABLE customers ADD CONSTRAINT contact_phone_not_null CHECK (contact_phone IS NOT NULL);
+ALTER TABLE customers ADD CONSTRAINT contact_email_not_null CHECK (contact_email IS NOT NULL);
+ALTER TABLE customers ADD CONSTRAINT address_not_null CHECK (address IS NOT NULL);
+
+-- テーブルの作成
+CREATE TABLE public.employee_projects (
+    id serial PRIMARY KEY,
+    employee_id integer,
+    project_id integer,
+    start_date date,
+    end_date date
 );
 
 
--- 为技能表添加日语注释
-COMMENT ON TABLE skills IS '従業員のスキル情報を格納します';
+-- インデックスの作成
+CREATE UNIQUE INDEX employee_projects_pkey ON employee_projects (id);
 
--- 为客户表添加日语注释
-COMMENT ON TABLE clients IS '企業の顧客情報を格納します';
+-- 制約の追加
+ALTER TABLE employee_projects ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
 
--- 为项目表添加日语注释
-COMMENT ON TABLE projects IS '企業のプロジェクト情報を格納します';
+-- PRIMARY KEY 制約の追加
+ALTER TABLE employee_projects ADD CONSTRAINT employee_projects_pkey PRIMARY KEY (id);
 
--- 为员工表添加日语注释
-COMMENT ON TABLE employees IS '企業の従業員情報を格納します';
+-- テーブルの作成
+CREATE TABLE employees (
+    id serial PRIMARY KEY,
+    name character varying(255) NOT NULL,
+    position character varying(255) NOT NULL,
+    base_salary integer NOT NULL,
+    address character varying(500),
+    phone character varying(15),
+    hire_date date,
+    skill_id integer,
+    email character varying(255),
+    gender integer CHECK (gender IN (0, 1)), -- 0: 男性, 1: 女性
+    birthdate date
+);
 
--- 为勤务表添加日语注释
-COMMENT ON TABLE attendances IS '従業員の勤務情報を格納します';
+-- インデックスの作成
+CREATE UNIQUE INDEX employees_pkey ON employees (id);
 
--- 为员工-项目派遣表添加日语注释
-COMMENT ON TABLE employee_projects IS '従業員とプロジェクトの関連情報を格納します';
+-- 制約の追加
+ALTER TABLE employees ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE employees ADD CONSTRAINT name_not_null CHECK (name IS NOT NULL);
+ALTER TABLE employees ADD CONSTRAINT position_not_null CHECK (position IS NOT NULL);
+ALTER TABLE employees ADD CONSTRAINT base_salary_not_null CHECK (base_salary IS NOT NULL);
 
 
--- 为技能表的字段添加日语版注释
-COMMENT ON COLUMN skills.id IS 'ID';
-COMMENT ON COLUMN skills.skill_name IS 'スキル名';
-COMMENT ON COLUMN skills.description IS '説明';
+-- テーブルの作成
+CREATE TABLE login_failures (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL,
+    login_failure_time timestamp(6) without time zone NOT NULL,
+    ip_address character varying(50)
+);
 
--- 为客户表的字段添加日语版注释
-COMMENT ON COLUMN clients.id IS 'ID';
-COMMENT ON COLUMN clients.client_name IS 'クライアント名';
-COMMENT ON COLUMN clients.contact_name IS '連絡先名';
-COMMENT ON COLUMN clients.contact_phone IS '連絡先電話';
-COMMENT ON COLUMN clients.contact_email IS '連絡先メール';
-COMMENT ON COLUMN clients.address IS '住所';
+-- インデックスの作成
+CREATE UNIQUE INDEX fail_pkey ON login_failures (id);
 
--- 为项目表的字段添加日语版注释
-COMMENT ON COLUMN projects.id IS 'ID';
-COMMENT ON COLUMN projects.project_name IS 'プロジェクト名';
-COMMENT ON COLUMN projects.client_id IS 'クライアントID';
-COMMENT ON COLUMN projects.start_date IS '開始日';
-COMMENT ON COLUMN projects.end_date IS '終了日';
-COMMENT ON COLUMN projects.description IS '説明';
+-- 制約の追加
+ALTER TABLE login_failures ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE login_failures ADD CONSTRAINT user_id_not_null CHECK (user_id IS NOT NULL);
+ALTER TABLE login_failures ADD CONSTRAINT login_failure_time_not_null CHECK (login_failure_time IS NOT NULL);
 
--- 为员工表的字段添加日语版注释
-COMMENT ON COLUMN employees.id IS 'ID';
-COMMENT ON COLUMN employees.name IS '名前';
-COMMENT ON COLUMN employees.position IS '役職';
-COMMENT ON COLUMN employees.base_salary IS '基本給与';
-COMMENT ON COLUMN employees.address IS '住所';
-COMMENT ON COLUMN employees.phone IS '電話番号';
-COMMENT ON COLUMN employees.hire_date IS '雇用日';
-COMMENT ON COLUMN employees.skill_id IS 'スキルID';
+-- デフォルト値の設定
+ALTER TABLE login_failures ALTER COLUMN ip_address SET DEFAULT NULL;
 
--- 为勤务表的字段添加日语版注释
+-- テーブルの作成
+CREATE TABLE history (
+    id serial PRIMARY KEY,
+    user_id integer NOT NULL,
+    login_time timestamp(6) without time zone NOT NULL,
+    ip_address character varying(50)
+);
+
+-- インデックスの作成
+CREATE UNIQUE INDEX history_pkey ON history (id);
+
+-- 制約の追加
+ALTER TABLE history ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE history ADD CONSTRAINT user_id_not_null CHECK (user_id IS NOT NULL);
+ALTER TABLE history ADD CONSTRAINT login_time_not_null CHECK (login_time IS NOT NULL);
+
+
+
+-- テーブルの作成
+CREATE TABLE projects (
+    id serial PRIMARY KEY,
+    project_name character varying(255) NOT NULL,
+    customer_id integer,
+    start_date date,
+    end_date date,
+    description text
+);
+
+-- インデックスの作成
+CREATE UNIQUE INDEX projects_pkey ON projects (id);
+
+-- 制約の追加
+ALTER TABLE projects ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE projects ADD CONSTRAINT project_name_not_null CHECK (project_name IS NOT NULL);
+
+-- テーブルの作成
+CREATE TABLE skills (
+    id serial PRIMARY KEY,
+    skill_name character varying(255) NOT NULL,
+    description text
+);
+
+-- インデックスの作成
+CREATE UNIQUE INDEX skills_pkey ON skills (id);
+
+-- 制約の追加
+ALTER TABLE skills ADD CONSTRAINT id_not_null CHECK (id IS NOT NULL);
+ALTER TABLE skills ADD CONSTRAINT skill_name_not_null CHECK (skill_name IS NOT NULL);
+
+
+
+-- 外部キー情報を追加
+ALTER TABLE employees ADD CONSTRAINT 外部キー名 FOREIGN KEY (カラム名) REFERENCES 参照先テーブル名(参照先カラム名);
+
+
+-- 外部キー情報を追加
+ALTER TABLE history ADD CONSTRAINT history_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id);
+
+-- 外部キーの追加
+ALTER TABLE projects ADD CONSTRAINT projects_customer_id_fkey FOREIGN KEY (customer_id) REFERENCES customers(id);
+
+-- 外部キーの追加
+ALTER TABLE attendances ADD CONSTRAINT attendances_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES employees(id);
+
+-- 外部キーの追加
+ALTER TABLE employee_projects ADD CONSTRAINT employee_projects_employee_id_fkey FOREIGN KEY (employee_id) REFERENCES employees(id);
+ALTER TABLE employee_projects ADD CONSTRAINT employee_projects_project_id_fkey FOREIGN KEY (project_id) REFERENCES projects(id);
+
+
+
+
+-- テーブルの論理名を追加
+COMMENT ON TABLE attendances IS '勤怠情報';
+
+-- カラムの論理名を追加
 COMMENT ON COLUMN attendances.id IS 'ID';
 COMMENT ON COLUMN attendances.employee_id IS '従業員ID';
 COMMENT ON COLUMN attendances.date IS '日付';
 COMMENT ON COLUMN attendances.hours_worked IS '勤務時間';
 COMMENT ON COLUMN attendances.is_absent IS '欠勤';
 COMMENT ON COLUMN attendances.overtime_hours IS '残業時間';
+COMMENT ON COLUMN attendances.description IS '備考';
 
--- 为员工-项目派遣表的字段添加日语版注释
-COMMENT ON COLUMN employee_projects.id IS 'ID';
-COMMENT ON COLUMN employee_projects.employee_id IS '従業員ID';
-COMMENT ON COLUMN employee_projects.project_id IS 'プロジェクトID';
-COMMENT ON COLUMN employee_projects.start_date IS '開始日';
-COMMENT ON COLUMN employee_projects.end_date IS '終了日';
+-- テーブルの論理名を追加
+COMMENT ON TABLE public.employee_projects IS '従業員プロジェクト';
+
+-- カラムの論理名を追加
+COMMENT ON COLUMN public.employee_projects.id IS 'ID';
+COMMENT ON COLUMN public.employee_projects.employee_id IS '従業員ID';
+COMMENT ON COLUMN public.employee_projects.project_id IS 'プロジェクトID';
+COMMENT ON COLUMN public.employee_projects.start_date IS '開始日';
+COMMENT ON COLUMN public.employee_projects.end_date IS '終了日';
+
+-- テーブルの論理名を変更
+COMMENT ON TABLE public.customers IS '顧客情報';
+
+-- カラムの論理名を変更
+COMMENT ON COLUMN public.customers.id IS 'ID';
+COMMENT ON COLUMN public.customers.customer_name IS '顧客名';
+COMMENT ON COLUMN public.customers.contact_name IS '連絡先名';
+COMMENT ON COLUMN public.customers.contact_phone IS '連絡先電話';
+COMMENT ON COLUMN public.customers.contact_email IS '連絡先メール';
+COMMENT ON COLUMN public.customers.address IS '住所';
+
+-- テーブルの論理名
+COMMENT ON TABLE public.employees IS '従業員情報';  
+
+-- カラムの論理名
+COMMENT ON COLUMN public.employees.id IS 'ID'; 
+COMMENT ON COLUMN public.employees.name IS '氏名';
+COMMENT ON COLUMN public.employees.position IS '役職';
+COMMENT ON COLUMN public.employees.base_salary IS '基本給';
+COMMENT ON COLUMN public.employees.address IS '住所';
+COMMENT ON COLUMN public.employees.phone IS '電話番号';
+COMMENT ON COLUMN public.employees.hire_date IS '入社日';
+COMMENT ON COLUMN public.employees.skill_id IS 'スキルID';
+COMMENT ON COLUMN public.employees.email IS 'メールアドレス';
+COMMENT ON COLUMN public.employees.gender IS '性別';
+COMMENT ON COLUMN public.employees.birthdate IS '生年月日';
+
+-- テーブルに論理名を追加
+COMMENT ON TABLE public.history IS 'ヒストリーテーブル';
+
+-- カラムに論理名を追加
+COMMENT ON COLUMN public.history.id IS 'ID';
+COMMENT ON COLUMN public.history.user_id IS 'ユーザーID';
+COMMENT ON COLUMN public.history.login_time IS 'ログイン時刻';
+COMMENT ON COLUMN public.history.ip_address IS 'IPアドレス';
+
+-- テーブルに論理名を追加
+COMMENT ON TABLE public.login_failures IS 'ログイン失敗履歴テーブル';
+
+-- カラムに論理名を追加
+COMMENT ON COLUMN public.login_failures.id IS 'ID';
+COMMENT ON COLUMN public.login_failures.user_id IS 'ユーザーID';
+COMMENT ON COLUMN public.login_failures.login_failure_time IS 'ログイン失敗時刻';
+COMMENT ON COLUMN public.login_failures.ip_address IS 'IPアドレス';
+
+-- テーブルに論理名を追加
+COMMENT ON TABLE public.projects IS 'プロジェクトテーブル';
+
+-- カラムに論理名を追加
+COMMENT ON COLUMN public.projects.id IS 'ID';
+COMMENT ON COLUMN public.projects.project_name IS 'プロジェクト名';
+COMMENT ON COLUMN public.projects.customer_id IS '顧客ID';
+COMMENT ON COLUMN public.projects.start_date IS '開始日';
+COMMENT ON COLUMN public.projects.end_date IS '終了日';
+COMMENT ON COLUMN public.projects.description IS '説明';
+
+-- テーブルに論理名を追加
+COMMENT ON TABLE public.skills IS 'スキルテーブル';
+
+-- カラムに論理名を追加
+COMMENT ON COLUMN public.skills.id IS 'ID';
+COMMENT ON COLUMN public.skills.skill_name IS 'スキル名';
+COMMENT ON COLUMN public.skills.description IS '説明';
+
+
+
+
+
+
